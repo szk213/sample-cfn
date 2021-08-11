@@ -1,0 +1,14 @@
+= sample-cfn
+
+== network
+
+vpc,subnetなどを作成する
+
+=== 実行方法
+
+. `aws cloudformation package --template-file ./network-cfn.yml --output-template packaged.yaml --s3-bucket バケット名`
+. `aws cloudformation deploy --template-file /mnt/c/Users/szk/github/szk213/sample-cfn/packaged.yaml --stack-name network`
+
+=== 削除
+
+. `aws cloudformation delete-stack --stack-name network`

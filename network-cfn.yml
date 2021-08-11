@@ -1,0 +1,93 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Network template
+
+Parameters:
+  VPCNetworkAddressPart:
+    Type: String
+    Default: 10.0
+
+Resources:
+  # VPC
+  VPC:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./network/vpc-cfn.yml
+      Parameters:
+        CidrBlock: 
+          !Sub 
+            - "${networkAddressPart}.0.0/16"
+            - networkAddressPart: !Ref VPCNetworkAddressPart
+  # Public subnet
+  PublicSubnetA:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./network/public-subnet-cfn.yml
+      Parameters:
+        VPCId: !GetAtt VPC.Outputs.VPCId
+        AZ: !Select [0, !GetAZs '' ]
+        CidrBlock:
+          !Sub 
+            - "${networkAddressPart}.0.0/24"
+            - networkAddressPart: !Ref VPCNetworkAddressPart
+        RouteTableId: !GetAtt VPC.Outputs.RouteTableId
+  PublicSubnetC:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./network/public-subnet-cfn.yml
+      Parameters:
+        VPCId: !GetAtt VPC.Outputs.VPCId
+        AZ: !Select [1, !GetAZs '' ]
+        CidrBlock: 10.0.1.0/24
+        RouteTableId: !GetAtt VPC.Outputs.RouteTableId
+  PublicSubnetD:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./network/public-subnet-cfn.yml
+      Parameters:
+        VPCId: !GetAtt VPC.Outputs.VPCId
+        AZ: !Select [2, !GetAZs '' ]
+        CidrBlock: 10.0.2.0/24
+        RouteTableId: !GetAtt VPC.Outputs.RouteTableId
+  # Private subnet
+  PrivateSubnetA:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./network/private-subnet-cfn.yml
+      Parameters:
+        VPCId: !GetAtt VPC.Outputs.VPCId
+        AZ: !Select [0, !GetAZs '' ]
+        CidrBlock: 10.0.3.0/24
+ 
+  PrivateSubnetC:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./network/private-subnet-cfn.yml
+      Parameters:
+        VPCId: !GetAtt VPC.Outputs.VPCId
+        AZ: !Select [1, !GetAZs '' ]
+        CidrBlock: 10.0.4.0/24
+ 
+  PrivateSubnetD:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./network/private-subnet-cfn.yml
+      Parameters:
+        VPCId: !GetAtt VPC.Outputs.VPCId
+        AZ: !Select [2, !GetAZs '' ]
+        CidrBlock: 10.0.5.0/24
+ 
+Outputs:
+  VPCId:
+    Description: VPC CIDR Block
+    Value: !GetAtt VPC.Outputs.VPCId
+    Export:
+      Name: vpc-id
+
+  PublicSubnet1Id:
+    Description: PublicSubnet1 CIDR Block
+    Value: !GetAtt PublicSubnetA.Outputs.SubnetId
+    Export:
+      Name: public-subnet-a-id
+
+
+

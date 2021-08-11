@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Hands-on template for VPC
+
+Parameters:
+  VPCId:
+    Type: String
+  CidrBlock:
+    Type: String
+    Description: CIDRBlock of VPC
+  AZ:
+    Type: String
+    Description: AZ
+
+Resources:
+  Subnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: !Ref CidrBlock
+      VpcId: !Ref VPCId
+      AvailabilityZone: !Ref AZ
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: Subnet
+
+Outputs:
+  SubnetId:
+    Description: Subnet id
+    Value: !Ref Subnet

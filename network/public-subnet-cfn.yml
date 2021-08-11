@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Hands-on template for VPC
+
+Parameters:
+  VPCId:
+    Type: String
+  CidrBlock:
+    Type: String
+    Description: CIDRBlock of VPC
+  AZ:
+    Type: String
+    Description: AZ
+  RouteTableId:
+    Type: String
+    Description: RouteTableId
+
+Resources:
+  Subnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: !Ref CidrBlock
+      VpcId: !Ref VPCId
+      AvailabilityZone: !Ref AZ
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: Subnet
+
+  SubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Subnet
+      RouteTableId: !Ref RouteTableId
+
+Outputs:
+  SubnetId:
+    Description: Subnet id
+    Value: !Ref Subnet
