@@ -2,9 +2,9 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: Network template
 
 Parameters:
-  VPCNetworkAddressPart:
+  VPCCidrBlock:
     Type: String
-    Default: 10.0
+    Default: 10.0.0.0/16
 
 Resources:
   # VPC
@@ -13,10 +13,7 @@ Resources:
     Properties:
       TemplateURL: ./network/vpc-cfn.yml
       Parameters:
-        CidrBlock: 
-          !Sub 
-            - "${networkAddressPart}.0.0/16"
-            - networkAddressPart: !Ref VPCNetworkAddressPart
+        CidrBlock: !Ref VPCCidrBlock
   # Public subnet
   PublicSubnetA:
     Type: AWS::CloudFormation::Stack
@@ -25,10 +22,7 @@ Resources:
       Parameters:
         VPCId: !GetAtt VPC.Outputs.VPCId
         AZ: !Select [0, !GetAZs '' ]
-        CidrBlock:
-          !Sub 
-            - "${networkAddressPart}.0.0/24"
-            - networkAddressPart: !Ref VPCNetworkAddressPart
+        CidrBlock: !Select [0, !Cidr [ !Ref VPCCidrBlock, 6, 8 ]]
         RouteTableId: !GetAtt VPC.Outputs.RouteTableId
   PublicSubnetC:
     Type: AWS::CloudFormation::Stack
@@ -37,7 +31,7 @@ Resources:
       Parameters:
         VPCId: !GetAtt VPC.Outputs.VPCId
         AZ: !Select [1, !GetAZs '' ]
-        CidrBlock: 10.0.1.0/24
+        CidrBlock: !Select [1, !Cidr [ !Ref VPCCidrBlock, 6, 8 ]]
         RouteTableId: !GetAtt VPC.Outputs.RouteTableId
   PublicSubnetD:
     Type: AWS::CloudFormation::Stack
@@ -46,8 +40,9 @@ Resources:
       Parameters:
         VPCId: !GetAtt VPC.Outputs.VPCId
         AZ: !Select [2, !GetAZs '' ]
-        CidrBlock: 10.0.2.0/24
+        CidrBlock: !Select [2, !Cidr [ !Ref VPCCidrBlock, 6, 8 ]]
         RouteTableId: !GetAtt VPC.Outputs.RouteTableId
+
   # Private subnet
   PrivateSubnetA:
     Type: AWS::CloudFormation::Stack
@@ -56,8 +51,7 @@ Resources:
       Parameters:
         VPCId: !GetAtt VPC.Outputs.VPCId
         AZ: !Select [0, !GetAZs '' ]
-        CidrBlock: 10.0.3.0/24
- 
+        CidrBlock: !Select [3, !Cidr [ !Ref VPCCidrBlock, 6, 8 ]]
   PrivateSubnetC:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -65,8 +59,7 @@ Resources:
       Parameters:
         VPCId: !GetAtt VPC.Outputs.VPCId
         AZ: !Select [1, !GetAZs '' ]
-        CidrBlock: 10.0.4.0/24
- 
+        CidrBlock: !Select [4, !Cidr [ !Ref VPCCidrBlock, 6, 8 ]]
   PrivateSubnetD:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -74,7 +67,7 @@ Resources:
       Parameters:
         VPCId: !GetAtt VPC.Outputs.VPCId
         AZ: !Select [2, !GetAZs '' ]
-        CidrBlock: 10.0.5.0/24
+        CidrBlock: !Select [5, !Cidr [ !Ref VPCCidrBlock, 6, 8 ]]
  
 Outputs:
   VPCId:
